@@ -14,7 +14,7 @@
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
                         <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
-                        <x-nav-link href="/blog" :active="request()->is('blog')">Blog</x-nav-link>
+                        <x-nav-link href="/posts" :active="request()->is('blog')">Blog</x-nav-link>
                         <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>
                         <x-nav-link href="/contact" :active="request()->is('contact')">Contact</x-nav-link>
                     </div>
@@ -80,7 +80,7 @@
     <div x-show="mobileMenuOpen" class="md:hidden" style="display: none;">
         <div class="space-y-1 px-2 pt-2 pb-3 sm:px-3">
             <x-nav-link-mobile href="/" :active="request()->is('/')">Home</x-nav-link-mobile>
-            <x-nav-link-mobile href="/blog" :active="request()->is('blog')">Blog</x-nav-link-mobile>
+            <x-nav-link-mobile href="/posts" :active="request()->is('blog')">Blog</x-nav-link-mobile>
             <x-nav-link-mobile href="/about" :active="request()->is('about')">About</x-nav-link-mobile>
             <x-nav-link-mobile href="/contact" :active="request()->is('contact')">Contact</x-nav-link-mobile>
         </div>
