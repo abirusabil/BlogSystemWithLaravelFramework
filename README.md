@@ -1,58 +1,350 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📝 Laravel Blog System - Modern Content Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem blog modern berbasis **Laravel** yang dirancang dengan arsitektur bersih, performa optimal (pencegahan masalah *N+1 Query*), sistem pencarian & filtering multi-kriteria modular, serta antarmuka responsif menggunakan **Tailwind CSS**, **Flowbite**, dan **Alpine.js**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📑 Daftar Isi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [✨ Fitur Utama](#-fitur-utama)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🗄️ Arsitektur & Relasi Database](#️-arsitektur--relasi-database)
+- [🔄 Alur Kerja Aplikasi (Application Lifecycle & Request Flow)](#-alur-kerja-aplikasi-application-lifecycle--request-flow)
+- [🔍 Mekanisme Query Scope & Search / Filtering](#-mekanisme-query-scope--search--filtering)
+- [🌐 Daftar Routing & Endpoint](#-daftar-routing--endpoint)
+- [📂 Struktur Direktori](#-struktur-direktori)
+- [🚀 Panduan Instalasi & Menjalankan Aplikasi](#-panduan-instalasi--menjalankan-aplikasi)
+- [🧪 Database Seeder & Dummy Data](#-database-seeder--dummy-data)
+- [🎨 Testing & Standar Kode](#-testing--standar-kode)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## ✨ Fitur Utama
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. **Sistem Blog & Artikel Terstruktur**:
+   - Menampilkan artikel terbaru dalam format grid modern (3 kolom responsif).
+   - Tampilan detail artikel (*single post*) lengkap dengan metadata penulis, tanggal publikasi (*human-readable* & format ISO), dan badge kategori dinamis.
+   - Truncate teks artikel secara rapi menggunakan `Str::limit()`.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Pencarian & Filtering Multi-Kriteria (Modular Scope)**:
+   - **Pencarian Universal**: Mencari kata kunci pada `title` atau `body` artikel.
+   - **Filter Kategori**: Menyaring artikel berdasarkan kategori topik tertentu.
+   - **Filter Penulis**: Menyaring artikel yang ditulis oleh author spesifik.
+   - **Kombinasi Filter**: Mendukung kombinasi pencarian teks bersamaan dengan filter kategori maupun penulis tanpa saling menimpa (*preserving query string* pada form & pagination).
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+3. **Optimasi Performa & Query Eager Loading**:
+   - Menghindari masalah **N+1 Query** dengan mengimplementasikan default *Eager Loading* (`protected $with = ['author', 'category']`) pada model `Post`.
+   - Menggunakan *Route Model Binding* kustom menggunakan kolom `slug` dan `username` (`{post:slug}`, `{category:slug}`, `{user:username}`) alih-alih `id`.
 
-## Agentic Development
+4. **Paginasi Pintar (Smart Pagination)**:
+   - Pembagian 9 artikel per halaman dengan `paginate(9)`.
+   - Integrasi `withQueryString()` agar parameter filter pencarian tetap aktif saat berpindah halaman.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+5. **Antarmuka Modern & Modular (Blade Components)**:
+   - Struktur layout modular berbasis Blade Component (`<x-layout>`, `<x-navbar>`, `<x-header>`, `<x-nav-link>`).
+   - Navigasi responsif dengan toggle mobile menu dan dropdown profil menggunakan **Alpine.js**.
+   - Komponen UI modern berbasis **Flowbite** dan **Tailwind CSS v4** dengan font typography **Inter**.
+   - Badge warna kategori dinamis yang disimpan langsung dari database.
 
-```bash
-composer require laravel/boost --dev
+---
 
-php artisan boost:install
+## 🛠️ Tech Stack
+
+### Backend
+- **Framework**: Laravel 12 / 13 (PHP 8.3+)
+- **ORM**: Eloquent ORM dengan PHP 8 Attributes (`#[Fillable]`, `#[Scope]`, `#[Hidden]`)
+- **Database**: SQLite (default) / MySQL / PostgreSQL support
+- **Testing**: Pest PHP v5 & PHPUnit
+
+### Frontend & Asset Bundling
+- **Styling**: Tailwind CSS v4 (`@tailwindcss/vite`)
+- **UI Components**: Flowbite
+- **Micro-interactivity**: Alpine.js
+- **Typography**: Inter Font Family
+- **Build Tool**: Vite & Laravel Vite Plugin
+
+---
+
+## 🗄️ Arsitektur & Relasi Database
+
+Aplikasi memiliki 3 entitas utama yang saling berelasi:
+
+```
+ ┌──────────────┐             ┌──────────────┐
+ │    users     │ 1         N │    posts     │
+ │──────────────│─────────────│──────────────│
+ │ id (PK)      │             │ id (PK)      │
+ │ name         │             │ title        │
+ │ username (UQ)│             │ slug (UQ)    │
+ │ email (UQ)   │             │ author_id(FK)│──────┐
+ │ password     │             │ category_id  │      │
+ └──────────────┘             │ body         │      │
+                              │ created_at   │      │
+                              │ updated_at   │      │
+                              └──────────────┘      │
+                                     │ N            │
+                                     │              │
+                                     │ 1            │
+                              ┌──────────────┐      │
+                              │  categories  │      │
+                              │──────────────│      │
+                              │ id (PK)      │      │
+                              │ name         │      │
+                              │ slug (UQ)    │      │
+                              │ color        │      │
+                              └──────────────┘      │
+                                     ▲              │
+                                     └──────────────┘
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Penjelasan Relasi:
+- **`User` ➔ `Post` (`HasMany` / `BelongsTo`)**:
+  - Satu `User` (Author) dapat menulis banyak `Post`.
+  - Foreign key: `author_id` merujuk ke `users.id`.
+- **`Category` ➔ `Post` (`HasMany` / `BelongsTo`)**:
+  - Satu `Category` menaungi banyak `Post`.
+  - Foreign key: `category_id` merujuk ke `categories.id`.
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🔄 Alur Kerja Aplikasi (Application Lifecycle & Request Flow)
 
-## Code of Conduct
+Berikut gambaran alur request saat pengguna berinteraksi dengan aplikasi blog:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Pengunjung / User
+    participant Router as Laravel Routing (web.php)
+    participant Model as Eloquent Model (Post/Category/User)
+    participant DB as Database (SQLite/MySQL)
+    participant View as Blade View & Components
 
-## Security Vulnerabilities
+    User->>Router: Akses GET /posts?search=laravel&category=php
+    Router->>Model: Post::filter(request)->latest()->paginate(9)
+    Note over Model: Memicu scopeFilter() & Eager Loading (author, category)
+    Model->>DB: Query SQL dengan WHERE LIKE, WHERE EXISTS, & LIMIT OFFSET
+    DB-->>Model: Mengembalikan Collection data Post beserta relasi
+    Model-->>Router: Instance LengthAwarePaginator
+    Router->>View: Render view('posts', ['posts' => $posts])
+    Note over View: Merender layout.blade, navbar, posts grid, pagination links
+    View-->>User: Tampilan HTML + CSS Tailwind + Alpine.js
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🔍 Mekanisme Query Scope & Search / Filtering
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Logika filter pencarian ditempatkan secara bersih pada Model `Post` menggunakan fitur **Local Query Scope**:
+
+```php
+#[Scope]
+protected function scopeFilter(Builder $query, array $filters): void
+{
+    // 1. Filter Pencarian Teks (Judul atau Isi Body)
+    $query->when(
+        $filters['search'] ?? false,
+        fn ($query, $search) =>
+        $query->where(fn ($query) =>
+            $query->where('title', 'like', '%' . $search . '%')
+                  ->orWhere('body', 'like', '%' . $search . '%')
+        )
+    );
+
+    // 2. Filter Kategori berdasarkan Slug Kategori
+    $query->when(
+        $filters['category'] ?? false,
+        fn ($query, $category) =>
+        $query->whereHas('category', fn ($query) =>
+            $query->where('slug', $category)
+        )
+    );
+
+    // 3. Filter Penulis berdasarkan Username
+    $query->when(
+        $filters['author'] ?? false,
+        fn ($query, $author) =>
+        $query->whereHas('author', fn ($query) =>
+            $query->where('username', $author)
+        )
+    );
+}
+```
+
+### Keunggulan Implementasi Ini:
+1. **Pencegahan N+1 Query**: Property `$with = ['author', 'category']` memastikan data relasi user dan category diambil dalam query tunggal menggunakan `IN (...)`.
+2. **Modular Query Builder**: Method `when()` hanya akan menambahkan klausa SQL jika parameter bersangkutan tersedia dalam request.
+3. **Preserving Query Parameters**: Form pencarian menyertakan `<input type="hidden">` untuk parameter `category` dan `author`, sehingga ketika pengunjung mencari kata kunci saat sedang membuka kategori tertentu, filter kategori tidak hilang.
+
+---
+
+## 🌐 Daftar Routing & Endpoint
+
+| Method | URI | Nama / Target View | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | `home` | Halaman utama / Landing Page |
+| `GET` | `/about` | `about` | Halaman profil About |
+| `GET` | `/contact` | `contact` | Halaman kontak |
+| `GET` | `/posts` | `posts` | Daftar semua artikel (Mendukung query `?search=`, `?category=`, `?author=`, `?page=`) |
+| `GET` | `/posts/{post:slug}` | `post` | Halaman detail artikel tunggal berdasarkan slug |
+| `GET` | `/authors/{user:username}` | `posts` | Menampilkan seluruh artikel yang ditulis oleh author tertentu |
+| `GET` | `/categories/{category:slug}`| `posts` | Menampilkan seluruh artikel di bawah kategori tertentu |
+
+---
+
+## 📂 Struktur Direktori
+
+```text
+blogsystem/
+├── app/
+│   ├── Http/
+│   │   └── Controllers/       # Controller aplikasi
+│   └── Models/
+│       ├── Category.php       # Model kategori (Relasi HasMany ke Post)
+│       ├── Post.php           # Model artikel (Scope Filter & Eager Loading)
+│       └── User.php           # Model pengguna/penulis (Relasi HasMany ke Post)
+├── database/
+│   ├── factories/             # Factory untuk generate dummy data
+│   │   ├── CategoryFactory.php
+│   │   ├── PostFactory.php
+│   │   └── UserFactory.php
+│   ├── migrations/            # Skema tabel database
+│   │   ├── 0001_01_01_000000_create_users_table.php
+│   │   ├── 2026_09_30_081409_create_posts_table.php
+│   │   └── 2026_10_01_042510_create_categories_table.php
+│   └── seeders/               # Seeder untuk inisialisasi data
+│       ├── CategorySeeder.php # Menyiapkan kategori awal (Laravel, PHP, Vue, dll)
+│       ├── DatabaseSeeder.php # Master seeder (Recycle factory untuk 100 posts)
+│       └── UserSeeder.php     # Menyiapkan user admin & dummy users
+├── resources/
+│   ├── css/
+│   │   └── app.css            # Styling aplikasi (Tailwind setup)
+│   ├── js/
+│   │   ├── app.js             # JavaScript entry point
+│   │   └── bootstrap.js
+│   └── views/
+│       ├── about.blade.php    # Halaman about
+│       ├── contact.blade.php  # Halaman kontak
+│       ├── home.blade.php     # Halaman beranda
+│       ├── post.blade.php     # Halaman detail artikel
+│       ├── posts.blade.php    # Halaman daftar & pencarian artikel
+│       └── components/        # Blade components yang dapat digunakan ulang
+│           ├── header.blade.php
+│           ├── layout.blade.php
+│           ├── nav-link.blade.php
+│           ├── nav-link-mobile.blade.php
+│           └── navbar.blade.php
+├── routes/
+│   └── web.php                # Definisi route web aplikasi
+├── tests/
+│   ├── Feature/               # Feature testing (Pest / PHPUnit)
+│   └── Unit/                  # Unit testing
+├── composer.json              # Konfigurasi dependensi PHP
+├── package.json               # Konfigurasi dependensi NPM (Tailwind & Vite)
+└── vite.config.js             # Konfigurasi build Vite
+```
+
+---
+
+## 🚀 Panduan Instalasi & Menjalankan Aplikasi
+
+Ikuti langkah-langkah berikut untuk menjalankan proyek di komputer lokal:
+
+### 1. Prasyarat Sistem
+- **PHP** >= 8.3 (dengan ekstensi `pdo_sqlite` / `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`)
+- **Composer** >= 2.x
+- **Node.js** & **NPM** >= 18.x
+
+### 2. Clone Repository & Masuk ke Direktori
+```bash
+git clone https://github.com/username/blogsystem.git
+cd blogsystem
+```
+
+### 3. Install Dependensi PHP & Node.js
+```bash
+# Install package composer
+composer install
+
+# Install dependensi frontend
+npm install
+```
+
+### 4. Setup Environment File
+Salin file `.env.example` menjadi `.env`, lalu generate encryption key:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+### 5. Setup Database & Jalankan Migrasi + Seeder
+Secara default aplikasi menggunakan SQLite. Buat file database jika belum ada, lalu jalankan migrasi beserta data awal:
+```bash
+# Buat file database SQLite (jika menggunakan SQLite)
+touch database/database.sqlite
+
+# Jalankan migrasi dan seeding data
+php artisan migrate:fresh --seed
+```
+
+> [!TIP]
+> Perintah `--seed` akan secara otomatis membuat 1 user utama (`abirusabil`), 10 user dummy, 5 kategori teknologi (`Laravel`, `PHP`, `JavaScript`, `Vue`, `React`), serta **100 artikel blog dummy** yang tersebar di antara author dan kategori tersebut.
+
+### 6. Menjalankan Server Pengembangan (Dev Server)
+
+Jalankan server Laravel dan Vite secara bersamaan:
+
+```bash
+# Jalankan menggunakan Composer script bawaan
+composer run dev
+
+# ATAU jalankan di dua terminal terpisah:
+# Terminal 1:
+php artisan serve
+
+# Terminal 2:
+npm run dev
+```
+
+Buka browser dan akses aplikasi melalui tautan:
+👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)** atau **[http://localhost:8000](http://localhost:8000)**
+
+---
+
+## 🧪 Database Seeder & Dummy Data
+
+Sistem seeding menggunakan teknik **Factory Recycling** (`recycle()`) untuk memastikan data realistis tanpa menciptakan duplikasi entitas yang berlebihan:
+
+- **Akun Default Penulis**:
+  - **Nama**: Abiru Sabil
+  - **Username**: `abirusabil`
+  - **Email**: `R9P7o@example.com`
+  - **Password**: `password`
+- **Kategori Bawaan**:
+  - `Laravel` (`#FF2D20`)
+  - `PHP` (`#777777`)
+  - `JavaScript` (`#F0DB4F`)
+  - `Vue` (`#42b883`)
+  - `React` (`#61dafb`)
+
+---
+
+## 🎨 Testing & Standar Kode
+
+Proyek ini telah dikonfigurasi dengan standar kode modern dan tool testing:
+
+### Menjalankan Automated Tests
+```bash
+php artisan test
+# Atau menggunakan Pest runner langsung
+vendor/bin/pest
+```
+
+### Memeriksa & Memperbaiki Format Kode (Pint)
+```bash
+vendor/bin/pint --format agent
+```
+
+---
+
+<p align="center">Dikembangkan dengan ❤️ menggunakan <b>Laravel Framework</b></p>
